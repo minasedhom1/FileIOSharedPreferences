@@ -2,6 +2,7 @@ package com.example.mido.fileiosharedpreferences;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,6 +21,10 @@ EditText editText;
     Button read_btn,write_btn;
     TextView data_tv;
     SharedPreferences sharedPreferences;
+
+
+    UserSettingsChangeListener listener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +35,7 @@ EditText editText;
         data_tv= (TextView) findViewById(R.id.data_tv);
 
         sharedPreferences=getSharedPreferences(getPackageName()+"."+TAG,MODE_PRIVATE);
-
+        
         write_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,10 +63,18 @@ EditText editText;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        listener=new UserSettingsChangeListener(getApplicationContext());
         if(item.getItemId()==R.id.action_setting)
         {
             startActivity(new Intent(MainActivity.this,SettingActivity.class));
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).registerOnSharedPreferenceChangeListener(listener);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).unregisterOnSharedPreferenceChangeListener(listener);
     }
 }
